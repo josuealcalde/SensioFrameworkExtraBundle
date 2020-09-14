@@ -123,6 +123,9 @@ class IsGrantedListenerTest extends \PHPUnit\Framework\TestCase
         $arguments = [];
         if (null !== $subject) {
             $arguments[$subject] = 'bar';
+            foreach ((array) $subject as $value) {
+                $arguments[$value] = 'bar';
+            }
         }
 
         $listener = new IsGrantedListener($this->createArgumentNameConverter($arguments), $authChecker);
@@ -149,6 +152,8 @@ class IsGrantedListenerTest extends \PHPUnit\Framework\TestCase
         yield [['ROLE_ADMIN'], null, 'Access Denied by controller annotation @IsGranted("ROLE_ADMIN")'];
         yield [['ROLE_ADMIN', 'ROLE_USER'], null, 'Access Denied by controller annotation @IsGranted(["ROLE_ADMIN", "ROLE_USER"])'];
         yield [['ROLE_ADMIN', 'ROLE_USER'], 'product', 'Access Denied by controller annotation @IsGranted(["ROLE_ADMIN", "ROLE_USER"], product)'];
+        yield [['ROLE_ADMIN', 'ROLE_USER'], ['product'], 'Access Denied by controller annotation @IsGranted(["ROLE_ADMIN", "ROLE_USER"], product)'];
+        yield [['ROLE_ADMIN', 'ROLE_USER'], ['product', 'feature'], 'Access Denied by controller annotation @IsGranted(["ROLE_ADMIN", "ROLE_USER"], [product, feature])'];
     }
 
     public function testNotFoundHttpException()
